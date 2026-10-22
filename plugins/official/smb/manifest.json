@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "id": "org.fiex.smb",
+  "name": "SMB / NAS",
+  "version": "0.1.0",
+  "protocolVersion": "1.0",
+  "capabilities": [
+    "filesystem",
+    "connectionFactory"
+  ],
+  "entrypoints": {
+    "windows-x86_64": "fiex-plugin-smb.exe",
+    "macos-aarch64": "fiex-plugin-smb",
+    "macos-x86_64": "fiex-plugin-smb",
+    "linux-x86_64": "fiex-plugin-smb"
+  },
+  "contributes": {
+    "connectionFactories": [
+      {
+        "id": "smb",
+        "title": "SMB 网络共享",
+        "fields": [
+          {
+            "id": "host",
+            "label": "主机",
+            "type": "text",
+            "required": true,
+            "placeholder": "nas.local"
+          },
+          {
+            "id": "port",
+            "label": "端口",
+            "type": "number",
+            "defaultValue": "445"
+          },
+          {
+            "id": "share",
+            "label": "共享名",
+            "type": "text",
+            "required": true,
+            "placeholder": "Public"
+          },
+          {
+            "id": "base",
+            "label": "子路径",
+            "type": "text"
+          },
+          {
+            "id": "username",
+            "label": "用户名",
+            "type": "text"
+          },
+          {
+            "id": "password",
+            "label": "密码",
+            "type": "secret"
+          }
+        ]
+      }
+    ],
+    "settings": [
+      {
+        "id": "scanInterval",
+        "label": "目录扫描间隔（秒）",
+        "type": "number",
+        "defaultValue": "90"
+      }
+    ]
+  },
+  "permissions": {
+    "storage": true,
+    "secrets": true,
+    "network": true,
+    "filesystem.read": true,
+    "filesystem.write": true,
+    "externalCommands": false,
+    "ui.dialog": true
+  },
+  "author": {
+    "name": "Fiex Contributors",
+    "url": "https://github.com/kevinhuang001/flex-official-plugins"
+  }
+}

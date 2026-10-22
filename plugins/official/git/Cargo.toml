@@ -1,0 +1,20 @@
+[package]
+name = "fiex-plugin-git"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.90"
+license = "MIT"
+
+[dependencies]
+fiex-plugin-sdk = { git = "https://github.com/kevinhuang001/flex-sdk.git", rev = "4d4bc1f1b1fc911d923b636433457a7731ef0b1b" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+dunce = "1"
+which = "8"
+base64 = "0.22"
+dirs = "6"
+globset = "0.4"
+mime_guess = "2"
+
+[dev-dependencies]
+tempfile = "3"

@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "id": "org.fiex.archive",
+  "name": "压缩与解压",
+  "version": "0.1.0",
+  "protocolVersion": "1.0",
+  "capabilities": [
+    "commands",
+    "toolbar",
+    "contextMenu"
+  ],
+  "entrypoints": {
+    "windows-x86_64": "fiex-plugin-archive.exe",
+    "macos-aarch64": "fiex-plugin-archive",
+    "macos-x86_64": "fiex-plugin-archive",
+    "linux-x86_64": "fiex-plugin-archive"
+  },
+  "permissions": {
+    "storage": false,
+    "secrets": false,
+    "filesystem.read": true,
+    "filesystem.write": true,
+    "ui.dialog": true
+  },
+  "contributes": {
+    "toolbar": [
+      {
+        "id": "archive.main",
+        "title": "压缩与解压",
+        "icon": "archive",
+        "command": "archive.compress"
+      }
+    ],
+    "contextMenus": [
+      {
+        "id": "archive.compress",
+        "title": "压缩为…",
+        "when": "context.selection.count > 0",
+        "children": [
+          {
+            "id": "archive.zip",
+            "title": "ZIP",
+            "command": "archive.compress",
+            "args": {
+              "format": "zip"
+            },
+            "picker": {
+              "mode": "saveFile",
+              "suggestedName": "Archive.zip",
+              "extensions": [
+                "zip"
+              ],
+              "param": "destination"
+            }
+          },
+          {
+            "id": "archive.7z",
+            "title": "7z",
+            "command": "archive.compress",
+            "args": {
+              "format": "7z"
+            },
+            "picker": {
+              "mode": "saveFile",
+              "suggestedName": "Archive.7z",
+              "extensions": [
+                "7z"
+              ],
+              "param": "destination"
+            }
+          },
+          {
+            "id": "archive.tar",
+            "title": "TAR",
+            "command": "archive.compress",
+            "args": {
+              "format": "tar"
+            },
+            "picker": {
+              "mode": "saveFile",
+              "suggestedName": "Archive.tar",
+              "extensions": [
+                "tar"
+              ],
+              "param": "destination"
+            }
+          },
+          {
+            "id": "archive.tar.gz",
+            "title": "TAR.GZ",
+            "command": "archive.compress",
+            "args": {
+              "format": "tar.gz"
+            },
+            "picker": {
+              "mode": "saveFile",
+              "suggestedName": "Archive.tar.gz",
+              "extensions": [
+                "gz"
+              ],
+              "param": "destination"
+            }
+          },
+          {
+            "id": "archive.tar.bz2",
+            "title": "TAR.BZ2",
+            "command": "archive.compress",
+            "args": {
+              "format": "tar.bz2"
+            },
+            "picker": {
+              "mode": "saveFile",
+              "suggestedName": "Archive.tar.bz2",
+              "extensions": [
+                "bz2"
+              ],
+              "param": "destination"
+            }
+          },
+          {
+            "id": "archive.tar.xz",
+            "title": "TAR.XZ",
+            "command": "archive.compress",
+            "args": {
+              "format": "tar.xz"
+            },
+            "picker": {
+              "mode": "saveFile",
+              "suggestedName": "Archive.tar.xz",
+              "extensions": [
+                "xz"
+              ],
+              "param": "destination"
+            }
+          }
+        ]
+      },
+      {
+        "id": "archive.extract",
+        "title": "解压缩到…",
+        "when": "context.selection.isFile",
+        "command": "archive.extract",
+        "picker": {
+          "mode": "openDirectory",
+          "param": "destination"
+        }
+      },
+      {
+        "id": "archive.advanced",
+        "title": "高级压缩…",
+        "when": "context.selection.count > 0",
+        "openPanel": "archive.options"
+      }
+    ],
+    "panels": [
+      {
+        "id": "archive.options",
+        "title": "高级压缩",
+        "entry": "ui/index.html",
+        "placement": "modal",
+        "defaultSize": {
+          "width": 630,
+          "height": 470
+        }
+      }
+    ]
+  },
+  "author": {
+    "name": "Fiex Contributors",
+    "url": "https://github.com/kevinhuang001/flex-official-plugins"
+  }
+}

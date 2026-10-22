@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "org.fiex.git",
+  "name": "Git",
+  "version": "0.1.0",
+  "protocolVersion": "1.0",
+  "capabilities": [
+    "filesystem",
+    "toolbar",
+    "commands",
+    "panel"
+  ],
+  "entrypoints": {
+    "windows-x86_64": "fiex-plugin-git.exe",
+    "macos-aarch64": "fiex-plugin-git",
+    "macos-x86_64": "fiex-plugin-git",
+    "linux-x86_64": "fiex-plugin-git"
+  },
+  "contributes": {
+    "toolbar": [
+      {
+        "id": "git.main",
+        "title": "源代码管理",
+        "icon": "git-branch",
+        "command": "git.status"
+      }
+    ],
+    "settings": [
+      {
+        "id": "historyLimit",
+        "label": "历史提交显示条数",
+        "type": "number",
+        "defaultValue": "50"
+      }
+    ]
+  },
+  "permissions": {
+    "storage": true,
+    "secrets": false,
+    "network": false,
+    "filesystem.read": true,
+    "filesystem.write": true,
+    "externalCommands": true,
+    "ui.dialog": true
+  },
+  "author": {
+    "name": "Fiex Contributors",
+    "url": "https://github.com/kevinhuang001/flex-official-plugins"
+  }
+}
