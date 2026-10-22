@@ -1,0 +1,89 @@
+name: Official plugin tests, Core integration and packages
+on:
+  push:
+    branches: [feat/fiex-repo-split, main]
+    tags: ['plugins-v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    name: Native plugins (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-22.04, target: x86_64-unknown-linux-gnu, platform: linux-x86_64}
+          - {os: windows-latest, target: x86_64-pc-windows-msvc, platform: windows-x86_64}
+          - {os: macos-14, target: aarch64-apple-darwin, platform: macos-aarch64}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: plugins/official/git -> target
+          key: plugin-split-${{ matrix.target }}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Build, unit test, exercise the real subprocess, package
+        shell: bash
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/test-ipc.py scripts/package-fiex-plugin.py
+          for slug in git webdav smb archive checksum; do
+            cargo test --manifest-path "plugins/official/${slug}/Cargo.toml" --target "${{ matrix.target }}"
+            cargo build --release --manifest-path "plugins/official/${slug}/Cargo.toml" --target "${{ matrix.target }}"
+            bin="target/${{ matrix.target }}/release/fiex-plugin-${slug}"
+            if [ "${{ matrix.platform }}" = windows-x86_64 ]; then bin="${bin}.exe"; fi
+            python scripts/test-ipc.py --binary "$bin" --plugin-id "org.fiex.${slug}"
+            python scripts/package-fiex-plugin.py --slug "$slug" --target "${{ matrix.target }}"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: optional-plugins-${{ matrix.platform }}
+          path: dist/plugins/*.fiexplugin
+          if-no-files-found: error
+  core-host:
+    name: Real Fiex PluginHost and checksum process integration
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: kevinhuang001/fiex
+          ref: feat/plugin-sdk-extraction
+          path: fiex-core
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with: {key: plugin-core-host}
+      - name: Compile external checksum process and exercise Core host
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo build --manifest-path plugins/official/checksum/Cargo.toml
+          FIEX_TEST_NATIVE_PLUGIN_PATH="$PWD/plugins/official/checksum/target/debug/fiex-plugin-checksum" \
+            FIEX_TEST_PLUGIN_ID=org.fiex.checksum \
+            cargo test --manifest-path fiex-core/src-tauri/Cargo.toml --no-default-features --lib plugin_host::tests::external_process_roundtrip -- --nocapture
+  release:
+    if: startsWith(github.ref, 'refs/tags/plugins-v')
+    needs: [native, core-host]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'optional-plugins-*', path: dist/plugins, merge-multiple: true}
+      - name: Publish plugin assets to this repository
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" dist/plugins/*.fiexplugin \
+            --repo "${GITHUB_REPOSITORY}" --verify-tag \
+            --title "${GITHUB_REF_NAME}" --notes "Optional plugins; no preinstall or special permissions."
