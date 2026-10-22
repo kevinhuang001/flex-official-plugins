@@ -4,7 +4,7 @@ version="0.1.0"
 edition="2021"
 rust-version="1.90"
 [dependencies]
-fiex-plugin-sdk = { git = "https://github.com/kevinhuang001/flex-sdk.git", rev = "b25f133e1846ee28ee28a925b09aa20144164343" }
+fiex-plugin-sdk = { git = "https://github.com/kevinhuang001/flex-sdk.git", rev = "75df648a8160aa69ef803b67194ce5de749f00f3" }
 serde_json="1"
 globset="0.4"
 zip={version="4",default-features=false,features=["deflate","bzip2","zstd","aes-crypto"]}

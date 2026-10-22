@@ -6,7 +6,7 @@ rust-version = "1.90"
 license = "MIT"
 
 [dependencies]
-fiex-plugin-sdk = { git = "https://github.com/kevinhuang001/flex-sdk.git", rev = "b25f133e1846ee28ee28a925b09aa20144164343" }
+fiex-plugin-sdk = { git = "https://github.com/kevinhuang001/flex-sdk.git", rev = "75df648a8160aa69ef803b67194ce5de749f00f3" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 dunce = "1"

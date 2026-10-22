@@ -64,14 +64,19 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with: {key: plugin-core-host}
-      - name: Compile external checksum process and exercise Core host
+      - name: Core host launches real checksum plugin with consent and IPC
         shell: bash
         run: |
           set -euo pipefail
           cargo build --manifest-path plugins/official/checksum/Cargo.toml
-          FIEX_TEST_NATIVE_PLUGIN_PATH="$PWD/plugins/official/checksum/target/debug/fiex-plugin-checksum" \
-            FIEX_TEST_PLUGIN_ID=org.fiex.checksum \
-            cargo test --manifest-path fiex-core/src-tauri/Cargo.toml --no-default-features --lib plugin_host::tests::external_process_roundtrip -- --nocapture
+          export FIEX_PLUGIN_DIR="$PWD/.ci/plugins"
+          export XDG_DATA_HOME="$PWD/.ci/profile"
+          mkdir -p "$FIEX_PLUGIN_DIR/org.fiex.checksum"
+          cp plugins/official/checksum/manifest.json "$FIEX_PLUGIN_DIR/org.fiex.checksum/manifest.json"
+          cp plugins/official/checksum/target/debug/fiex-plugin-checksum "$FIEX_PLUGIN_DIR/org.fiex.checksum/fiex-plugin-checksum"
+          chmod +x "$FIEX_PLUGIN_DIR/org.fiex.checksum/fiex-plugin-checksum"
+          git -C fiex-core submodule update --init sdk
+          cargo run --locked --manifest-path fiex-core/src-tauri/Cargo.toml --no-default-features --example plugin_smoke -- org.fiex.checksum
   release:
     if: startsWith(github.ref, 'refs/tags/plugins-v')
     needs: [native, core-host]
